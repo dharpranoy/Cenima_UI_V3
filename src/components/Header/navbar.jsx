@@ -1,24 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthServices from '../Services/AuthServices';
+import UserFetch from '../UserFetch';
 
 const Navbar = (props) => {
 
   let [isCollapsed, setIsCollapsed] = useState(true);
 
-  const [superCreds, setSuperCreds] = useState(null)
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRole, setIsRole] = useState(null)
-  useEffect(() => {
-    if (props.creds != null && props.isLoggedIn) {
-
-      setIsRole(props.creds.user_role[0].authority);
-      setIsLoading(false);
-      setSuperCreds(props.creds)
-
-    }
-  }, [props.creds, props.isLoggedIn]);
-
+  const { isLoggedIn, creds, bigtoken, isRole } = UserFetch();
+  console.log(creds)
   const handleToggle = () => {
     setIsCollapsed(!isCollapsed);
   }
@@ -34,8 +24,18 @@ const Navbar = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(superCreds)
-    navigate(`/view-search-result/${search.searchValue}?isRole=${isRole}&isLoggedIn=${props.isLoggedIn}`)
+    if (search.searchValue != "") {
+      navigate(`/view-search-result/${search.searchValue}`)
+    }
+  }
+
+  const handleLogout = () => {
+    console.log(bigtoken)
+    AuthServices.logout(bigtoken).then(
+      () => {
+        window.location.reload()
+      }
+    )
   }
 
   return (
@@ -78,13 +78,13 @@ const Navbar = (props) => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link to={`${props.isLoggedIn ? '/profile' : '/login'}`} className="nav-link active" style={{ color: '#FFA500' }} aria-current="page">
-              {props.isLoggedIn ?"Profile":"Login/Sign Up"}  
+              <Link to={`${isLoggedIn ? '/profile' : '/login'}`} className="nav-link active" style={{ color: '#FFA500' }} aria-current="page">
+                {isLoggedIn ? "Profile" : "Login/Sign Up"}
               </Link>
             </li>
 
-            {props.isLoggedIn && <li className="nav-item">
-              <Link onClick={() => props.logout()} className="nav-link active" style={{ color: '#FFA500' }} aria-current="page">
+            {isLoggedIn && <li className="nav-item">
+              <Link onClick={handleLogout} className="nav-link active" style={{ color: '#FFA500' }} aria-current="page">
                 logout
               </Link>
             </li>}
@@ -105,6 +105,7 @@ const Navbar = (props) => {
               placeholder="Search"
               aria-label="Search"
               onChange={handleChange}
+              required
             />
             <button
               className="btn btn-outline"

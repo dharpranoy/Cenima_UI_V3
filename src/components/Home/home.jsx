@@ -6,21 +6,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthServices from '../Services/AuthServices';
 import Navbar from '../Header/navbar';
-
+import UserFetch from '../UserFetch';
 
 const Home = () => {
 
-  let [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [creds, setCreds] = useState(null);
-  useEffect(() => {
-    let storedCreds = localStorage.getItem('user');
-    console.log(storedCreds)
-    if (storedCreds != null) {
-      setCreds(JSON.parse(storedCreds))
-      setIsLoggedIn(true);
-    }
-    console.log(AuthServices.getCurrentUser())
-  }, []);
+  const { isLoggedIn, creds, bigtoken, isRole } = UserFetch();
 
   const logout = () => {
     AuthServices.logout();
@@ -28,13 +18,13 @@ const Home = () => {
   }
   return (
     <>
-      <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} creds={creds} logout={logout} />
+      <Navbar />
       <br />
-      <Recommended isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} creds={creds} logout={logout} />
+      <Recommended />
       <br />
-      <Trending isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} creds={creds} logout={logout} />
+      <Trending />
       <br />
-      <Genre isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} creds={creds} logout={logout} />
+      <Genre />
       <br />
 
     </>

@@ -4,8 +4,11 @@ import { useEffect } from "react";
 import Select from 'react-select';
 import { useNavigate, useParams } from "react-router-dom";
 import MovieServices from "../Services/MovieServices";
+import UserFetch from "../UserFetch";
 
 const MovieForm = (props) => {
+  const { isLoggedIn, creds, bigtoken, isRole } = UserFetch();
+
   let { id } = useParams();
   const navigate = useNavigate();
   const [movieData, setMovieData] = useState({
@@ -17,7 +20,7 @@ const MovieForm = (props) => {
     movieDesc: "",
     casts: [],
     genres: [],
-    trailerId:"",
+    trailerId: "",
     runtime: "",
     collection: "",
     language: "",
@@ -183,7 +186,7 @@ const MovieForm = (props) => {
       genres: movieData.genres,
       genreId: movieData.genreId,
       runtime: movieData.runtime,
-      trailerId:movieData.trailerId,
+      trailerId: movieData.trailerId,
       collection: `${movieData.collection} ${unit}`,
       language: movieData.language,
       posterUrl: movieData.posterUrl,
@@ -192,7 +195,7 @@ const MovieForm = (props) => {
 
     console.log('newMovie => ' + JSON.stringify(newMovie));
     if (movieData.id === '_add') {
-      MovieServices.createMovie(newMovie).then(res => {
+      MovieServices.createMovie(newMovie, bigtoken).then(res => {
         console.log(res.data)
         navigate('/')
       }, (error) => {
@@ -203,7 +206,7 @@ const MovieForm = (props) => {
 
     }
     else {
-      MovieServices.updateMovie(newMovie, id).then(res => {
+      MovieServices.updateMovie(newMovie, id, bigtoken).then(res => {
         console.log(res.data);
         navigate('/')
       })
@@ -215,7 +218,7 @@ const MovieForm = (props) => {
       producer: "",
       motionPictureRating: "",
       movieDesc: "",
-      trailerId:"",
+      trailerId: "",
       casts: [],
       genres: [],
       genreId: [],
@@ -314,7 +317,7 @@ const MovieForm = (props) => {
                 <label className="movieLabel">Cast</label>
 
                 <div>
-                  <div className="d-flex flex-wrap ">
+                  <div className="d-flex flex-wrap " style={{ overflowX: 'scroll' }}>
                     {movieData.casts.map((cast, index) => (
                       <div className="card mb-3 mr-2" style={{ marginRight: '8px' }} key={index}>
                         <div className="card-body" style={{ width: '15rem', backgroundColor: 'gray', border: '0', outline: 'none' }}>
@@ -415,7 +418,7 @@ const MovieForm = (props) => {
                   value={movieData.movieDesc}
                   onChange={handleChange}
                 />
-                
+
               </div>
               <div className="col-sm-6">
                 <label className="movieLabel">Trailer Video Id</label>
@@ -484,7 +487,7 @@ const MovieForm = (props) => {
                   onChange={handleCollectionChange}
                   placeholder="choose one"
                 >
-                   <option value="">Choose one</option>
+                  <option value="">Choose one</option>
                   <option value="Millions">Millions</option>
                   <option value="Billions">Billions</option>
                 </select>

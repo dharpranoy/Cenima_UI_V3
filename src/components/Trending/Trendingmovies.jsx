@@ -5,21 +5,15 @@ import { FaStar } from "react-icons/fa";
 import MovieServices from "../Services/MovieServices";
 import { useNavigate } from "react-router-dom";
 import ViewMovieModal from "../moviemodal";
+import UserFetch from "../UserFetch.jsx";
 
-const Trending = (props) => {
-  const [rmovie, setRmovie] = useState([]);
+const Trending = () => {
+  let [rmovie, setRmovie] = useState([]);
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRole, setIsRole] = useState(null)
   const [showModal, setShowModal] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const { isLoggedIn, creds, bigtoken, isRole } = UserFetch();
 
-  useEffect(() => {
-    if (props.creds != null && props.isLoggedIn) {
-      setIsRole(props.creds.user_role[0].authority);
-      setIsLoading(false);
-    }
-  }, [props.creds, props.isLoggedIn]);
 
   const fetchMovies = async () => {
     MovieServices.getTrending()
@@ -35,11 +29,15 @@ const Trending = (props) => {
   useEffect(() => {
     fetchMovies();
   }, []);
-
   const handleDelete = (id) => {
-    alert(id);
-  };
+    MovieServices.deleteMovie(id, bigtoken).then(
+      () => {
+        rmovie = rmovie.filter((movie) => movie.movieId !== id);
+        setRmovie(rmovie)
 
+      }
+    )
+  };
   const containerRef = useRef(null);
   const scrollLeft = () => {
     containerRef.current.scrollBy({
@@ -65,10 +63,10 @@ const Trending = (props) => {
 
 
   const viewAll = () => {
-    navigate("/viewall", { state: { rmovie: rmovie, isRole: isRole, isLoggedIn: props.isLoggedIn, title: "Trending movies" } });
+    navigate("/viewall");
   }
   const openMovie = (movieId) => {
-    navigate(`/view-movie/${movieId}`, { state: { isRole: isRole, isLoggedIn: props.isLoggedIn } });
+    navigate(`/view-movie/${movieId}`, { state: { isRole: isRole, isLoggedIn: isLoggedIn } });
   };
 
   return (

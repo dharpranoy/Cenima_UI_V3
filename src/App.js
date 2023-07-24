@@ -12,8 +12,10 @@ import Footer from './components/Footer/footer';
 import SearchResult from './components/searchresult/SearchResult';
 import ViewAll from './components/Viewall/ViewAll';
 import Profile from './components/Profile/Profile';
+import UserFetch from './components/UserFetch';
 
 function App() {
+  const { isLoggedIn, creds, bigtoken, isRole } = UserFetch();
   return (
     <div>
 
@@ -21,7 +23,7 @@ function App() {
         <Route exact path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path='/profile' element={<Profile/>}/>
+        <Route path='/profile' element={<Profile />} />
         <Route path="/addmovie/:id" element={<MovieForm />} />
         <Route path="/viewall" element={<ViewAll />} />
         <Route path="/view-movie/:id" element={<MovieDetailPage />} />

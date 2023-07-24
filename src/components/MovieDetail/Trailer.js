@@ -6,9 +6,11 @@ const Trailer = ({ videoId, height, width }) => {
     height: height,
     width: width,
     playerVars: {
-      autoplay: 1,
+      autoplay: 0,
       mute: 1,
       modestbranding: 1,
+      loop: 1,
+      playlist: videoId
     },
   };
 

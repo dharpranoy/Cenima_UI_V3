@@ -5,24 +5,16 @@ import { FaStar } from "react-icons/fa";
 import MovieServices from "../Services/MovieServices";
 import { useNavigate } from "react-router-dom";
 import ViewMovieModal from "../moviemodal";
+import UserFetch from "../UserFetch";
 
-const Recommended = (props) => {
-  const [rmovie, setRmovie] = useState([]);
+const Recommended = () => {
+  let [rmovie, setRmovie] = useState([]);
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRole, setIsRole] = useState(null)
   const [showModal, setShowModal] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
-  const [bigtoken, setBigtoken] = useState(null);
 
 
-  useEffect(() => {
-    if (props.creds != null && props.isLoggedIn) {
-      setIsRole(props.creds.user_role[0].authority);
-      setIsLoading(false);
-      setBigtoken(props.creds.token);
-    }
-  }, [props.creds, props.isLoggedIn]);
+  const { isLoggedIn, creds, bigtoken, isRole } = UserFetch();
 
   const fetchMovies = async () => {
     MovieServices.getMovies()
@@ -40,7 +32,13 @@ const Recommended = (props) => {
   }, []);
 
   const handleDelete = (id) => {
-    alert(id);
+    MovieServices.deleteMovie(id, bigtoken).then(
+      () => {
+        rmovie = rmovie.filter((movie) => movie.movieId !== id);
+        setRmovie(rmovie)
+
+      }
+    )
   };
 
   const containerRef = useRef(null);
@@ -66,10 +64,10 @@ const Recommended = (props) => {
   };
 
   const viewAll = () => {
-    navigate("/viewall", { state: { rmovie: rmovie, isRole: isRole, isLoggedIn: props.isLoggedIn, title: "Recommended movies" } });
+    navigate("/viewall");
   }
   const openMovie = (movieId) => {
-    navigate(`/view-movie/${movieId}`, { state: { isRole: isRole, isLoggedIn: props.isLoggedIn, token: bigtoken } });
+    navigate(`/view-movie/${movieId}`);
   };
 
   return (
@@ -106,7 +104,7 @@ const Recommended = (props) => {
                     <div className="card rcards" id={rmovie.movieId}>
                       {isRole == "ROLE_ADMIN" ? (
                         <div className="card-delete">
-                          <i onClick={() => handleDelete(index)}>
+                          <i onClick={() => handleDelete(rmovie.movieId)}>
                             <img src={"/delete.png"} height={25} width={25} />
                           </i>
                         </div>

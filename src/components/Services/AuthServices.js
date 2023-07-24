@@ -1,6 +1,6 @@
 import axios from "axios";
 const API_URL = "http://localhost:8080/api/";
-
+const API_URL2 = "http://localhost:8080/user/";
 /*const register = (username,email,password)=>{
     return axios.post(API_URL+"register",{
         username,
@@ -32,10 +32,19 @@ const register = async (username, password, email) => {
 }
 
 
-const logout = () => {
-    axios.get(API_URL + 'logout')
+const logout = (token) => {
+    const config = {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    }
+    console.log(config)
+    axios.get(API_URL2 + 'logout', config)
         .then((res) => {
             console.log('logged out')
+        })
+        .catch((err) => {
+
         })
     localStorage.removeItem("user");
 }

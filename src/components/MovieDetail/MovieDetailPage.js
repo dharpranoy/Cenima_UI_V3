@@ -8,10 +8,10 @@ import CastServices from "../Services/CastServices";
 import Review from "./Review";
 import GenreServices from "../Services/GenreServices";
 import Trailer from "./Trailer";
+import UserFetch from "../UserFetch";
+import Navbar from "../Header/navbar";
 
-
-const MovieDetailPage = (props) => {
-
+const MovieDetailPage = () => {
     let { id } = useParams();
     const [selected, setSelected] = useState(null);
     const [istrending, setIsTrending] = useState(false);
@@ -32,10 +32,8 @@ const MovieDetailPage = (props) => {
     });
 
     const navigate = useNavigate();
-    const location = useLocation();
-    
-    const { isRole, isLoggedIn, token } = location.state;
-    console.log(token)
+    const { isLoggedIn, creds, bigtoken, isRole } = UserFetch();
+    console.log(creds)
     const fetchMovies = async () => {
         MovieServices.getMovieById(id).then(
             res => changeMovieData(res.data)
@@ -52,11 +50,12 @@ const MovieDetailPage = (props) => {
         fetchMovies();
         fetchIsTrending();
 
+
     }, [])
 
     const deleteCast = (castId) => {
         alert("delete this Cast")
-        CastServices.deleteCast(castId).then(
+        CastServices.deleteCast(castId, bigtoken).then(
             (res) => {
                 const updatedCasts = moviedata.casts.filter((cast) => cast.castId !== castId);
                 changeMovieData((prevData) => ({ ...prevData, casts: updatedCasts }));
@@ -66,7 +65,7 @@ const MovieDetailPage = (props) => {
     }
     const removeGenre = (genreId) => {
         alert("remove genre")
-        GenreServices.deleteGenre(genreId).then(
+        GenreServices.deleteGenre(genreId, bigtoken).then(
             (res) => {
                 const updatedGenres = moviedata.genres.filter((genre) => genre.genreId !== genreId);
                 changeMovieData((prevData) => ({ ...prevData, genres: updatedGenres }));
@@ -88,17 +87,19 @@ const MovieDetailPage = (props) => {
         navigate(`/addmovie/${movieId}`);
     };
     const addToRecomm = (movieId) => {
-
-        MovieServices.addToTrending(movieId).then(
+        MovieServices.addToTrending(movieId, bigtoken).then(
             (res) => {
                 console.log(res.data)
                 setIsTrending(true);
             }
         )
+            .catch((err) => {
+                console.log(err)
+            })
         console.log("add")
     };
     const removeFromTrending = (movieId) => {
-        MovieServices.removeFromTrending(movieId).then(
+        MovieServices.removeFromTrending(movieId, bigtoken).then(
             (res) => {
                 console.log("removed from trending")
                 setIsTrending(false)
@@ -110,6 +111,7 @@ const MovieDetailPage = (props) => {
 
     return (
         <>
+            <Navbar />
             <div
                 className="flex-fill"
                 style={{
@@ -122,7 +124,7 @@ const MovieDetailPage = (props) => {
             >
                 <div className="box-main">
                     <div className="row align-items-stretch">
-                        <div className="col-md-6 ">
+                        <div className="col-md-6 " style={{ width: '660px' }}>
                             <div style={{
                                 backgroundImage: `url(${moviedata.posterUrl})`,
                                 backgroundRepeat: "no-repeat",
@@ -136,14 +138,15 @@ const MovieDetailPage = (props) => {
                                 flexDirection: "column",
                                 justifyContent: "space-between",
                                 height: "450px",
+                                width: "500px"
                             }}>
 
-                                <div className="detail-box">
+                                <div className="detail-box" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
                                     <div className="row">
-                                        <div className="col" style={{ fontSize: "35px" }}>
+                                        <div className="col" style={{ fontSize: "30px", padding: '0.8rem' }}>
                                             <p>{moviedata.title}</p>
                                         </div>
-                                        <div className="col" style={{ fontSize: "35px" }}>
+                                        <div className="col" style={{ fontSize: "35px", padding: '0.8rem' }}>
                                             <p>
                                                 <span><FaStar /></span>
                                                 {moviedata.rating !== null ? moviedata.rating : "0"}/5
@@ -173,14 +176,16 @@ const MovieDetailPage = (props) => {
                                 style={{
                                     height: '100%', // Adjust the height as per your requirement
 
-                                    maxWidth: '100%',
+                                    width: '100%',
                                     display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
+                                    alignItems: 'left',
+                                    justifyContent: 'right',
 
                                 }}
                             >
-                                <Trailer videoId={moviedata.trailerId} height="450px" width="630px" />
+                                <div className="trailer-container" >
+                                    <Trailer videoId={moviedata.trailerId} height="450px" width="800px" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -190,7 +195,7 @@ const MovieDetailPage = (props) => {
                     </div>
                 </div>
 
-                <div className="box" style={{ textAlign: "left" }}>
+                <div className="box det" style={{ textAlign: "left" }}>
                     <div className="row">
                         <div className="col-sm-2 col-4">
                             <span>Release Date:</span>
@@ -239,7 +244,7 @@ const MovieDetailPage = (props) => {
                                     <div
                                         className={selected === 0 ? "content show" : "content"} style={{ paddingTop: '10px' }}
                                     >
-                                        <div className="card-container" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gridGap: "10px" }}>
+                                        <div className="castC" >
                                             {moviedata.casts.map((item, index) => (
                                                 <div className="card" key={index} style={{ width: "200px", margin: "10px" }}>
                                                     <img
@@ -250,7 +255,8 @@ const MovieDetailPage = (props) => {
                                                     />
                                                     <div className="card-body">
                                                         <h6 className="card-title" style={{ color: "#000000" }}>{item.castName}</h6>
-                                                        <h6 className="card-text">As {item.roleName}</h6>
+                                                        <h6 className="card-text">As </h6>
+                                                        <h6 className="card-text" style={{ backgroundColor: 'wheat' }}>{item.roleName}</h6>
                                                         {isRole === "ROLE_ADMIN" && (
                                                             <button
                                                                 className="btn btn-danger"
@@ -300,7 +306,7 @@ const MovieDetailPage = (props) => {
                     <Review movieId={moviedata.movieId}
                         isRole={isRole || ''}
                         isLoggedIn={isLoggedIn || false}
-                        token={token}
+                        token={bigtoken}
                     />
 
                 </div>

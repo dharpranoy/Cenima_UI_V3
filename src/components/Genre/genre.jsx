@@ -28,7 +28,7 @@ const Genre = (props) => {
     },
     {
       title: 'Comedy',
-      image: 'https://nofilmschool.com/sites/default/files/styles/facebook/public/screen_shot_2019-06-21_at_2.16.03_pm.png?itok=bcH1ZGO8',
+      image: 'https://m.media-amazon.com/images/M/MV5BNGUyNTk0YmYtNjU2YS00NWQ1LTllZGQtYjk5YjU4YzYxZjY3XkEyXkFqcGdeQXVyNjQ2MjQ5NzM@._V1_.jpg',
     },
     {
       title: 'Drama',

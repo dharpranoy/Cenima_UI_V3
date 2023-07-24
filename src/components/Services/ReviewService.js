@@ -7,30 +7,45 @@ class ReviewService {
     getReview(movieId) {
         return axios.get(Review_API_BASE_URL1 + '/' + movieId);
     }
-    deleteReview(reviewId) {
-        return axios.delete(Review_API_BASE_URL2 + '/' + reviewId)
-    }
-    postReview(movieId, review) {
-       /* const config = {
+    deleteReview(reviewId, token) {
+        const config = {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
-        }*/
-        return axios.post(Review_API_BASE_URL2 + '/' + movieId, review);
+        }
+
+        return axios.delete(Review_API_BASE_URL3 + '/' + reviewId, config);
+
     }
-    putReview(reviewId, review) {
-        /* const config = {
-             headers: {
-                 'Authorization': `Bearer ${token}`
-             }
-         }*/
-         return axios.put(Review_API_BASE_URL2 + '/' + reviewId, review);
-     }
+    postReview(movieId, review, token) {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
+        return axios.post(Review_API_BASE_URL3 + '/' + movieId, review, config);
+    }
+    putReview(reviewId, review, token) {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
+        return axios.put(Review_API_BASE_URL3 + '/' + reviewId, review, config);
+    }
 
-     getAllReviews(){
+    getAllReviews() {
         return axios.get(Review_API_BASE_URL1);
-     }
+    }
+    getSpecificReviews(token) {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
 
+        return axios.get(Review_API_BASE_URL3 + '/specific/', config);
+    }
 }
 
 export default new ReviewService();

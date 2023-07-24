@@ -65,9 +65,9 @@ const Review = ({ movieId, isRole, isLoggedIn, token }) => {
 
     const handleDelete = async (reviewId) => {
         try {
-            const res = await ReviewService.deleteReview(reviewId);
+            const res = await ReviewService.deleteReview(reviewId, token);
             console.log("Delete Response:", res);
-            if (res.status === 200) {
+            if (res.status === 204) {
                 console.log("Review deleted");
                 const updatedReviews = reviewRes.filter((review) => review.reviewId !== reviewId);
                 setReviewRes(updatedReviews);
@@ -100,14 +100,13 @@ const Review = ({ movieId, isRole, isLoggedIn, token }) => {
         console.log("review : " + review);
 
         const newReview = {
-            username: JSON.parse(localStorage.getItem('user')).user.userName,
             rating: rating,
             reviewText: review,
         };
         if (!update) {
             setReviewslist(newReview);
 
-            ReviewService.postReview(movieId, newReview).then((res => {
+            ReviewService.postReview(movieId, newReview, token).then((res => {
                 newReview["username"] = JSON.parse(localStorage.getItem('user')).user.userName;
                 setReviewRes((prevReviews) => [...prevReviews, res.data]);
                 console.log(res.data)
@@ -116,8 +115,7 @@ const Review = ({ movieId, isRole, isLoggedIn, token }) => {
 
         }
         else {
-            ReviewService.putReview(revId, newReview).then((res => {
-                newReview["username"] = JSON.parse(localStorage.getItem('user')).user.userName;
+            ReviewService.putReview(revId, newReview, token).then((res => {
                 const updatedUserReviews = [...userReviews];
                 updatedUserReviews[idx] = res.data;
                 setUserReviews(updatedUserReviews)
@@ -134,12 +132,9 @@ const Review = ({ movieId, isRole, isLoggedIn, token }) => {
     return (
         <div style={{ textAlign: "left", marginBottom: "30px", width: '100%' }}>
             <div id="reviewsec" style={{
-                padding: "30px", marginLeft: "150px",
-                marginRight: "150px",
-                marginTop: "20px",
-                padding: "20px",
-                border: "2px solid black",
-                borderRadius: "2rem"
+                margin: "1.5rem", resize: "none", padding: "0.9rem", borderRadius: "0.5rem", backgroundColor: "#251120", '@media (max-width: 768px)': {
+                    margin: '0'
+                }
             }}>
                 <h6><strong>Rating</strong></h6>
                 <div className='m-2'>
@@ -195,10 +190,10 @@ const Review = ({ movieId, isRole, isLoggedIn, token }) => {
 
             {
                 userReviews.length > 0 ? userReviews.map((rev, index) => (
-                    <div className="reviewbox" key={index}>
+                    <div className="reviewbox" key={index} style={{ width: "100%", height: "200px" }}>
                         <div className="row">
                             <div className="col"><span>{rev.username}</span></div>
-                            <div className="col" style={{ color: "#ffffff", }}>Rating:{rev.rating}</div>
+                            <div className="col reviewrate" style={{ color: "#ffffff", }}>Rating:{rev.rating}</div>
                         </div>
                         <div className="row">
                             <div className="col" style={{ color: "#ffffff", }}>{rev.reviewText}</div>
@@ -208,12 +203,12 @@ const Review = ({ movieId, isRole, isLoggedIn, token }) => {
                             <div className="col"><span>Date: </span> {rev.reviewDate}</div>
                         </div>
                         <div>
-                            <div className="row">
+                            <div className="row clk">
                                 <div className="col-sm-6 col-lg-3">
-                                    <button className="btn btn-danger" type="Submit" onClick={() => handleDelete(rev.reviewId)}>Delete</button>
+                                    <button className="btn btn-danger " type="Submit" onClick={() => handleDelete(rev.reviewId)}>Delete</button>
                                 </div>
                                 <div className="col-sm-6 col-lg-3">
-                                    <button className="btn btn-danger" type="Submit" onClick={() => handleUpdate(rev.reviewId, rev.reviewText, rev.rating, index)}>Update</button>
+                                    <button className="btn btn-danger " type="Submit" onClick={() => handleUpdate(rev.reviewId, rev.reviewText, rev.rating, index)}>Update</button>
                                 </div>
                             </div>
                         </div>
